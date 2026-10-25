@@ -10,9 +10,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-52%20Passing-brightgreen?style=flat-square)](tests)
 
-<p align="center">
-  <img src="demo.gif" width="850" alt="RAGI Demo Preview" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
-</p>
+
 
 ---
 
