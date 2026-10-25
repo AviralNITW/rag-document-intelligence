@@ -14,7 +14,7 @@ license: mit
 
 > High-performance, production-ready Retrieval-Augmented Generation (RAG) platform combining **dense vector retrieval (ChromaDB MMR)** and **sparse lexical search (BM25)** fused via **Reciprocal Rank Fusion (RRF)**, re-ranked by a **BGE cross-encoder**, and streamed via **Groq LPU hardware** with self-healing model failovers and session-isolated SQLite persistence.
 
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow?style=flat-square)](https://huggingface.co/spaces)
+[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20Demo-Hugging%20Face%20Spaces-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/Avinitw/rag-document-intelligence)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![LangChain](https://img.shields.io/badge/LangChain-0.1.17-1C3C3C?style=flat-square&logo=langchain&logoColor=white)](https://www.langchain.com/)
@@ -471,7 +471,8 @@ python -m unittest discover -s tests -v
 Engineered and maintained by **[AviralNITW](https://github.com/AviralNITW)**.
 
 - **GitHub:** [@AviralNITW](https://github.com/AviralNITW)
-- **Project Repository:** [rag-chatbot](https://github.com/AviralNITW/rag-chatbot)
+- **Project Repository:** [rag-document-intelligence](https://github.com/AviralNITW/rag-document-intelligence)
+- **Live Application:** [Hugging Face Space](https://huggingface.co/spaces/Avinitw/rag-document-intelligence)
 
 ---
 
