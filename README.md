@@ -1,7 +1,20 @@
+---
+title: RAGI Document Intelligence
+emoji: ⚡
+colorFrom: indigo
+colorTo: blue
+sdk: streamlit
+sdk_version: "1.32.0"
+app_file: app.py
+pinned: false
+license: mit
+---
+
 # RAGI — Enterprise Hybrid RAG Document Intelligence Platform
 
 > High-performance, production-ready Retrieval-Augmented Generation (RAG) platform combining **dense vector retrieval (ChromaDB MMR)** and **sparse lexical search (BM25)** fused via **Reciprocal Rank Fusion (RRF)**, re-ranked by a **BGE cross-encoder**, and streamed via **Groq LPU hardware** with self-healing model failovers and session-isolated SQLite persistence.
 
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-yellow?style=flat-square)](https://huggingface.co/spaces)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![LangChain](https://img.shields.io/badge/LangChain-0.1.17-1C3C3C?style=flat-square&logo=langchain&logoColor=white)](https://www.langchain.com/)

@@ -246,7 +246,15 @@ def get_llm_instance(model_name: Optional[str] = None, api_key: Optional[str] = 
     """Instantiates ChatGroq with the chosen or fallback model."""
     selected = model_name or FALLBACK_MODELS[0]
     key = api_key or os.getenv("GROQ_API_KEY")
+    if not key:
+        try:
+            import streamlit as st
+            if hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
+                key = st.secrets["GROQ_API_KEY"]
+        except Exception:
+            pass
     return ChatGroq(model=selected, temperature=0.2, groq_api_key=key)
+
 
 
 def _history_messages(chat_history: List[Dict[str, str]]) -> List[Any]:
