@@ -1,0 +1,15 @@
+venv/
+.venv/
+chroma_db/
+.env
+__pycache__/
+*.pyc
+*.log
+*.log.*
+.freebuff/
+.pytest_cache/
+.DS_Store
+
+# Session persistence (local SQLite + session anchor — never commit)
+ragi_session.db
+.session_id
