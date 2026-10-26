@@ -39,9 +39,18 @@ def get_embeddings() -> Any:
     if _embeddings is None:
         with _model_lock:
             if _embeddings is None:
+                try:
+                    import torch
+                    torch.set_num_threads(1)
+                except Exception:
+                    pass
                 from langchain_community.embeddings import HuggingFaceEmbeddings
                 logger.info("Loading embedding model 'all-MiniLM-L6-v2'...")
-                _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+                _embeddings = HuggingFaceEmbeddings(
+                    model_name="all-MiniLM-L6-v2",
+                    model_kwargs={"device": "cpu"},
+                    encode_kwargs={"batch_size": 4}
+                )
                 logger.info("Embedding model ready.")
     return _embeddings
 
@@ -52,6 +61,11 @@ def get_reranker() -> Any:
     if _reranker is None:
         with _model_lock:
             if _reranker is None:
+                try:
+                    import torch
+                    torch.set_num_threads(1)
+                except Exception:
+                    pass
                 from sentence_transformers import CrossEncoder
                 logger.info("Loading cross-encoder reranker 'BAAI/bge-reranker-base'...")
                 _reranker = CrossEncoder("BAAI/bge-reranker-base")
@@ -173,10 +187,14 @@ def rerank_documents(query: str, docs: List[Any], top_k: int = TOP_K_RERANK) -> 
     if not docs:
         return []
 
-    pairs = [(query, doc.page_content) for doc in docs]
-    scores = get_reranker().predict(pairs)
-    ranked = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
-    return ranked[:top_k]
+    try:
+        pairs = [(query, doc.page_content) for doc in docs]
+        scores = get_reranker().predict(pairs)
+        ranked = sorted(zip(docs, scores), key=lambda x: x[1], reverse=True)
+        return ranked[:top_k]
+    except Exception as e:
+        logger.warning("Cross-encoder reranking skipped/failed (%s); falling back to RRF rankings.", e)
+        return [(doc, 1.0 / (idx + 1)) for idx, doc in enumerate(docs[:top_k])]
 
 
 # ── 2-Stage Hybrid Retrieval ─────────────────────────────

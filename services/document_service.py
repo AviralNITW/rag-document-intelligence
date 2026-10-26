@@ -223,6 +223,8 @@ def process_and_index_document(
         collection_name=collection,
         persist_directory=CHROMA_DIR
     )
+    import gc
+    gc.collect()
 
     doc_record = {
         "id": str(uuid.uuid4()),
