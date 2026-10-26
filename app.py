@@ -1,6 +1,18 @@
 import streamlit as st
-import tempfile
 import os
+
+# ── Immediate Page Configuration (Sends layout to browser right away) ──────
+_LOGO_PATH = os.path.join(os.path.dirname(__file__), "assets", "ragi-logo.png")
+_PAGE_ICON = _LOGO_PATH if os.path.exists(_LOGO_PATH) else "📄"
+
+st.set_page_config(
+    page_title="RAGI — Document Intelligence",
+    page_icon=_PAGE_ICON,
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+import tempfile
 import base64
 import html
 import uuid
@@ -30,17 +42,6 @@ from services.workflow_service import (
 )
 import services.session_store as session_store
 from services.icons import get_icon
-
-# ── Page Configuration ────────────────────────────────────
-_LOGO_PATH = os.path.join(os.path.dirname(__file__), "assets", "ragi-logo.png")
-_PAGE_ICON = _LOGO_PATH if os.path.exists(_LOGO_PATH) else "📄"
-
-st.set_page_config(
-    page_title="RAGI — Document Intelligence",
-    page_icon=_PAGE_ICON,
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # ── Helper to Load Local Asset as Base64 ──────────────────
 def get_image_base64(filename: str) -> str:

@@ -11,11 +11,8 @@ from typing import List, Dict, Any, Generator, Tuple, Optional
 # posthog client and is imported before any Chroma usage.
 os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
-from langchain_community.vectorstores import Chroma
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from sentence_transformers import CrossEncoder
 from rank_bm25 import BM25Okapi
 from dotenv import load_dotenv
 
@@ -31,29 +28,31 @@ TOP_K_RERANK = 5
 CHROMA_DIR = os.path.join(".", "chroma_db")
 
 # ── Lazy Model Singletons (loaded on first query, not at import) ──
-_embeddings: Optional[HuggingFaceEmbeddings] = None
-_reranker: Optional[CrossEncoder] = None
+_embeddings: Optional[Any] = None
+_reranker: Optional[Any] = None
 _model_lock = threading.Lock()
 
 
-def get_embeddings() -> HuggingFaceEmbeddings:
+def get_embeddings() -> Any:
     """Returns the shared embedding model, loading it on first use."""
     global _embeddings
     if _embeddings is None:
         with _model_lock:
             if _embeddings is None:
+                from langchain_community.embeddings import HuggingFaceEmbeddings
                 logger.info("Loading embedding model 'all-MiniLM-L6-v2'...")
                 _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
                 logger.info("Embedding model ready.")
     return _embeddings
 
 
-def get_reranker() -> CrossEncoder:
+def get_reranker() -> Any:
     """Returns the shared cross-encoder reranker, loading it on first use."""
     global _reranker
     if _reranker is None:
         with _model_lock:
             if _reranker is None:
+                from sentence_transformers import CrossEncoder
                 logger.info("Loading cross-encoder reranker 'BAAI/bge-reranker-base'...")
                 _reranker = CrossEncoder("BAAI/bge-reranker-base")
                 logger.info("Reranker ready.")
@@ -211,6 +210,7 @@ def retrieve_hybrid_context(
     k_bm25 = top_k_bm25 * 2 if deep_search else top_k_bm25
     k_rerank = TOP_K_RERANK + 5 if deep_search else TOP_K_RERANK
 
+    from langchain_community.vectorstores import Chroma
     vectordb = Chroma(
         collection_name=collection,
         persist_directory=CHROMA_DIR,

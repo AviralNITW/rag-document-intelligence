@@ -10,37 +10,20 @@ from typing import List, Dict, Any, Tuple, Optional
 # instead of spamming the server log on every collection operation.
 os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 
-import chromadb
-import pdfplumber
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 
 logger = logging.getLogger(__name__)
 
 
 def _disable_chroma_telemetry() -> None:
-    """Neutralizes chromadb's posthog telemetry client.
-
-    chromadb 0.4.24 calls the legacy ``posthog.capture(user_id, name, props)``
-    signature while the installed posthog 7.x exposes
-    ``capture(event, **kwargs)``, so every event raises TypeError and gets
-    logged as "Failed to send telemetry event ...". Setting
-    ANONYMIZED_TELEMETRY=False only flips ``posthog.disabled``, which this
-    posthog version no longer honors — so the client methods themselves are
-    turned into no-ops. This is a local app; no telemetry should be attempted.
-    """
+    """Neutralizes chromadb's posthog telemetry client."""
     try:
         from chromadb.telemetry.product.posthog import Posthog
 
         Posthog.capture = lambda self, event: None
         Posthog._direct_capture = lambda self, event: None
-    except Exception as e:  # pragma: no cover — telemetry must never break the app
+    except Exception as e:
         logger.debug("Could not neutralize chromadb telemetry: %s", e)
-
-
-_disable_chroma_telemetry()
 
 MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024  # 200 MB maximum
 CHROMA_DIR = os.path.join(".", "chroma_db")
@@ -99,7 +82,9 @@ def collection_name_for(session_id: str) -> str:
     return f"session_{session_id.replace('-', '_')}"
 
 
-def _chroma_client() -> chromadb.PersistentClient:
+def _chroma_client() -> Any:
+    _disable_chroma_telemetry()
+    import chromadb
     return chromadb.PersistentClient(path=CHROMA_DIR)
 
 
@@ -114,6 +99,7 @@ def extract_document_pages(file_path: str, original_filename: str) -> List[Docum
 
     if ext == ".pdf":
         try:
+            import pdfplumber
             with pdfplumber.open(file_path) as pdf:
                 for page_idx, page in enumerate(pdf.pages):
                     page_text = page.extract_text() or ""
@@ -140,6 +126,7 @@ def extract_document_pages(file_path: str, original_filename: str) -> List[Docum
             logger.warning("pdfplumber extraction failed (%s); falling back to PyPDFLoader.", e)
 
         if not docs:
+            from langchain_community.document_loaders import PyPDFLoader
             loader = PyPDFLoader(file_path)
             for doc in loader.load():
                 if doc.page_content.strip():
@@ -209,6 +196,7 @@ def process_and_index_document(
 
     raw_pages = extract_document_pages(file_path, original_filename)
 
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=150,
@@ -227,6 +215,7 @@ def process_and_index_document(
         chunk.metadata = {k: v for k, v in chunk.metadata.items() if v is not None}
 
     # Store into ChromaDB
+    from langchain_community.vectorstores import Chroma
     collection = collection_name_for(session_id)
     Chroma.from_documents(
         documents=chunks,
